@@ -34,6 +34,10 @@ import re
 
 from munin_nag import normalize_plugin_name
 
+# Global var(s)
+options = None
+
+
 class Check(object):
 	def __init__(self):
 		self.title = None
@@ -66,13 +70,13 @@ class Check(object):
 	def __str__(self):
 		return "%s:%s %s" % (self.hostname, self.pluginname, self.haslevel)
 
-	def get_nagios_config(self, templates, hostexcludes):
-		template = (x for x in templates if x.ismatch(self.pluginname)).next()
+	def get_nagios_config(self):
+		template = (x for x in options.templates if x.ismatch(self.pluginname)).next()
 
 		if not template.include():
 			return "# Service %s excluded" % (self.pluginname)
 
-		for x in hostexcludes:
+		for x in options.hosts:
 			if x.exclude(self.hostname):
 				return "# Host %s excluded (service %s)" % (self.hostname, self.pluginname)
 
@@ -199,5 +203,5 @@ if __name__=="__main__":
 	checks.append(current)
 
 	f = open(options.output, "w")
-	f.write("\n".join([c.get_nagios_config(options.templates, options.hosts) for c in checks if c.haslevel]))
+	f.write("\n".join([c.get_nagios_config() for c in checks if c.haslevel]))
 	f.close()
