@@ -49,6 +49,7 @@ Commandline arguments
 	  -x HOSTS, --excludehost=HOSTS
 	                        Hosts to exclude. Any hosts matching the specified
 	                        regexp will have all their checks disabled.
+	  -z, --flatten         Flatten hostnames by removing the domain part
 
 A typical example will look something like this::
 
@@ -97,6 +98,14 @@ it's not already defined - use something like::
 	        command_line    /bin/false
 	}
 
+Hostname flattening
++++++++++++++++++++
+`munin2nagios.py` can be given the commandline option `-z` to make it flatten
+all hostnames by removing their domain name. Munin always works with the
+FQDN of the host, whereas Nagios often works with just the hostname - this
+allows mapping between them. Note that if `-z` is used in `munin2nagios.py`,
+it must also be enabled in `munin_nag.py`.
+
 munin_nag.py
 ------------
 The `munin_nag.py` script is the one that translates and sends the alerts
@@ -108,3 +117,9 @@ of::
 
 The Munin user must also be given write permissions to `nagios.cmd` to be
 able to send the alergs into Nagios.
+
+Hostname flattening
++++++++++++++++++++
+`munin_nag.py` takes an optional parameter `-z` to make it do hostname
+flattening, just like `nagios2munin.py`. If this parameter is used on one
+of the commands, it must be used on the other one as well.

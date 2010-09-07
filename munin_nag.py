@@ -46,6 +46,8 @@ def normalize_plugin_name(name):
 
 if __name__=="__main__":
 	opt = OptionParser(usage="%prog <nagioscommand> <host> <graph> [options]")
+	opt.add_option("-z", "--flatten", action="store_true", dest="flatten",
+				   help="Flatten hostnames by removing the domain part")
 
 	(options, args) = opt.parse_args()
 	if len(args) != 3:
@@ -73,7 +75,7 @@ if __name__=="__main__":
 
 	f.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%s;%s\n" % (
 			int(time.time()),
-			args[1].split('.')[0],
+			options.flatten and args[1].split('.')[0] or args[1],
 			normalize_plugin_name(args[2]),
 			alertlevel,
 			msg

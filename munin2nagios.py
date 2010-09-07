@@ -85,7 +85,9 @@ class Check(object):
 	service_description   %s
 	use                   %s
 	}""" % (
-	self.hostname.split('.')[0], normalize_plugin_name(self.title), template)
+			options.flatten and self.hostname.split('.')[0] or self.hostname,
+			normalize_plugin_name(self.title), template
+	)
 
 
 class Template(object):
@@ -146,6 +148,8 @@ if __name__=="__main__":
 				   dest="templates", help="Nagios template to use. Use format <regex>/template to use this template only of the check matches the regex. The first matching template will be used.")
 	opt.add_option("-x", "--excludehost", action="append", type="string",
 				   dest="hosts", help="Hosts to exclude. Any hosts matching the specified regexp will have all their checks disabled.")
+	opt.add_option("-z", "--flatten", action="store_true", dest="flatten",
+				   help="Flatten hostnames by removing the domain part")
 
 	(options, args) = opt.parse_args()
 	# Chech for mandatory arguments
