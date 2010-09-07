@@ -37,6 +37,7 @@
 import sys
 import re
 import time
+from optparse import OptionParser
 
 # Keep in sync with munin2nagios.py
 norm_re = re.compile('[^a-z0-9 ]', re.IGNORECASE)
@@ -44,9 +45,11 @@ def normalize_plugin_name(name):
 	return norm_re.sub('',name.strip().replace("%","percent"))
 
 if __name__=="__main__":
-	if len(sys.argv) != 4:
-		print "Usage: munin_nag.py <nagioscommand> <host> <graph>"
-		print "Got %s arguments (%s)" % (len(sys.argv), sys.argv)
+	opt = OptionParser(usage="%prog <nagioscommand> <host> <graph> [options]")
+
+	(options, args) = opt.parse_args()
+	if len(args) != 3:
+		opt.print_help()
 		sys.exit(1)
 
 	# Slurp the whole input, put it in a single field,
@@ -63,15 +66,15 @@ if __name__=="__main__":
 		alertlevel = 2 # CRITICAL
 
 	# Connect to nagios and send the message
-	f = open(sys.argv[1], "a")
+	f = open(args[0], "a")
 	if not f:
-		print "Failed to open nagios command channel %s" % sys.argv[1]
+		print "Failed to open nagios command channel %s" % args[0]
 		sys.exit(1)
 
 	f.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%s;%s\n" % (
 			int(time.time()),
-			sys.argv[2].split('.')[0],
-			normalize_plugin_name(sys.argv[3]),
+			args[1].split('.')[0],
+			normalize_plugin_name(args[2]),
 			alertlevel,
 			msg
 			))
